@@ -1,0 +1,4 @@
+git add *
+git commit -m "something to write"
+git push origin master
+o
