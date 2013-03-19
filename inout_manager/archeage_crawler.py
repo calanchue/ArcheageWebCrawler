@@ -3,6 +3,8 @@ import urllib
 
 from django.utils import timezone
 from inout_manager.models import *
+from django.core.exceptions import ObjectDoesNotExist
+
 
 def getSoup(url) :
     f= urllib.urlopen(url)
@@ -46,7 +48,7 @@ def getAllExpedList() :
     currPageNum = 1
     while True :
         listFromPage = getExpedListFromPage(currPageNum)
-        # currPageNum limit should be configured. 
+        #TODO currPageNum limit should be configured. 
         if (len(listFromPage) < 1) or  currPageNum > 1 :
             break
         #print "page=%d, num=%d" % (currPageNum, len(listFromPage))
@@ -77,37 +79,78 @@ def getExpedListFromPage(pageNum) :
     
 
 def getExpedMemberInfo(expedId): 
+    """ return MemberInfo List """
     soup = getSoup("http://play.archeage.com/expeditions/HIRAMAKAND/"+str(expedId)+"/members")
     expedMemberTable = soup.find("tbody").findAll("tr")
+    ret = []
     for memberRow in expedMemberTable :
         memberInfo = memberRow.findAll("td")
-        print memberInfo[1]
-        print MemberInfo(memberInfo[1].find("a").text, memberInfo[3].text, memberInfo[2].text).text()
+        print memberInfo[1].find("a").text
+        ret.append(MemberInfo(memberInfo[1].find("a").text, memberInfo[3].text, memberInfo[2].text))
+    return ret
+
+def updatePlayerInfo(exped, player):
+    """ input : django Expedition model, Player """
+    # iterate all player who is in any expedition. 
+    try :
+        # get one rows from multiple player rows.
+        # the most recent date of the player
+        playerInDbHistory = Player.objects.filter(name=player.name).order_by('-update_time')
+        if len(playerInDbHistory) == 0:
+            Player(name=player.name, exped=exped, update_time=currTime, inserted_time=currTime).save()
+            return
+        else :
+            playerInDb = playerInDbHistory[0]
+
+        if exped.exped_id == playerInDb.exped.exped_id:
+            playerInDb.update_time=currTime
+            playerInDb.save()
+        else :
+            Player(name=player.name,exped=exped, update_time = currTime, inserted_time=currTime ).save() 
+    except ObjectDoesNotExist:
+        Player(name=player.name, exped=exped, update_time=currTime, inserted_time=currTime ).save()
 
 
 def startCrawling():
+    global currTime 
     currTime = timezone.now()    
+    
     #update exped
     crawledList = getAllExpedList()
     for crawled in crawledList:
-        if not Expedtion.objects.filter(exped_id=crawled.id).exists():
-            Expedition(name=crawled.name, exped_id=crawled.id).save()
+        if not Expedition.objects.filter(exped_id=crawled.id).exists():
+            Expedition(name=crawled.name, exped_id=crawled.id, update_time=currTime,inserted_time=currTime).save()
     # get all members of the expeditions in the server.
-    expedIdList = Expedition.objects.all().values('exped_id')
-    for id in expedIdList:
-        getExpedMemberInfo(id)
-
-            
-
-    # only in crawled. new player
-     
-
-    # only in db. out of expedtion.
-    
-    #update member
+    expedIdList = Expedition.objects.all().values_list('exped_id', flat=True)
+    #TODO must remove slicing of the expedIdList
+    # crawl current all player in exped
+    for expedId in expedIdList[:5]:
+        print '# process exped %d' % expedId
+        pList = getExpedMemberInfo(expedId)
+        for player in pList:
+            print player.name
+            exped = Expedition.objects.get(exped_id=expedId)
+            updatePlayerInfo(exped, player)
+    print '-------outed---------' 
+    # remained player is someone who is out of exepdtion. update this.
+    playerNameOuted = list(set(Player.objects.exclude(update_time=currTime).values_list('name',flat=True)))           
+    for playerName in playerNameOuted:
+        print playerName
+        player = Player.objects.filter(name=playerName).order_by('-update_time')[0]
+        if player.exped is None:
+            # alredy outsider
+            player.update_time = currTime
+            player.save()
+            continue
+        else :
+            # new outsider
+            Player(name=playerName, exped=None, update_time = currTime, inserted_time=currTime ).save()
 
 def run():
-    getAllExpedList()
+    #getExpedMemberInfo(1005)
+    #playerInDb = Player.objects.filter(name='test_outed').order_by('-update_time')[0]
+    #print 'expedition = %s' % playerInDb.exped.name
+    startCrawling()
 
 #getExpedInfo(1005)
 #getExpedMemberInfo(1005)

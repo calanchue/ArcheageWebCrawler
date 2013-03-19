@@ -7,3 +7,4 @@ python manage.py loaddata temp_data.json
 
 
 south
+./manage.py schemamigration inout_manager --auto

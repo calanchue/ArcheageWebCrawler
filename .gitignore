@@ -1,0 +1,5 @@
+# db file
+sqlite3
+
+*.pyc
+*.swp
