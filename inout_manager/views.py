@@ -4,6 +4,7 @@ from django.template import RequestContext, Context, loader
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from inout_manager.models import *
+from django.db.models import Q
 
 def index(request):
     return render_to_response('starter-template.html',{}, context_instance=RequestContext(request))
@@ -74,3 +75,12 @@ def player_event(request, player_name):
     context = {'mig_history_list':mig_history_list}
     return render_to_response('inout_manager/player_history.dj.html', context, context_instance=RequestContext(request))
 
+def exped_event(request, exped_name):
+    exped = Expedition.objects.get(name=exeped_name)
+    exped_history = Player.objects.filter(Q(exped=exped)|Q(prev_recored__exped=exped)).order_by('-inserted_time')
+    mig_history = []
+    if event in exped_history:
+        mig_history.append(MigHistory(event.prev_record, event))
+    context = {'mig_history_list':mig_history_list}
+    return render_to_response('inout_manager/player_history.dj.html', context, context_instance=RequestContext(request))
+            
