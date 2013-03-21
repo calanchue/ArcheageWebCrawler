@@ -105,7 +105,7 @@ def updatePlayerInfo(exped, player):
             playerInDb.update_time=currTime
             playerInDb.save()
         else :
-            Player(name=player.name,exped=exped, update_time = currTime, inserted_time=currTime ).save() 
+            Player(name=player.name,exped=exped, update_time = currTime, inserted_time=currTime, prev_record=playerInDb ).save() 
     except ObjectDoesNotExist:
         Player(name=player.name, exped=exped, update_time=currTime, inserted_time=currTime ).save()
 
@@ -131,7 +131,7 @@ def startCrawling():
             updatePlayerInfo(exped, player)
     print '-------outed---------' 
     # remained player is someone who is out of exepdtion. update this.
-    playerNameOuted = list(set(Player.objects.exclude(update_time=currTime).values_list('name',flat=True)))           
+    playerNameOuted = list(set(Player.objects.exclude(update_time=inserted_time).values_list('name',flat=True)))           
     for playerName in playerNameOuted:
         print playerName
         player = Player.objects.filter(name=playerName).order_by('-update_time')[0]
@@ -142,7 +142,7 @@ def startCrawling():
             continue
         else :
             # new outsider
-            Player(name=playerName, exped=None, update_time = currTime, inserted_time=currTime ).save()
+            Player(name=playerName, exped=None, update_time = currTime, inserted_time=currTime, prev_record=player.exped ).save()
 
 def run():
     #getExpedMemberInfo(1005)
