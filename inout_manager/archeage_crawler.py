@@ -48,8 +48,7 @@ def getAllExpedList() :
     currPageNum = 1
     while True :
         listFromPage = getExpedListFromPage(currPageNum)
-        #TODO currPageNum limit should be configured. 
-        if (len(listFromPage) < 1) or  currPageNum > 1 :
+        if (len(listFromPage) < 1)  :
             break
         #print "page=%d, num=%d" % (currPageNum, len(listFromPage))
         allExpedInfo = allExpedInfo + listFromPage
@@ -122,9 +121,8 @@ def startCrawling():
             Expedition(name=crawled.name, exped_id=crawled.id, update_time=currTime,inserted_time=currTime).save()
     # get all members of the expeditions in the server.
     expedIdList = Expedition.objects.all().values_list('exped_id', flat=True)
-    #TODO must remove slicing of the expedIdList
     # crawl current all player in exped
-    for expedId in expedIdList[:5]:
+    for expedId in expedIdList:
         print '# process exped %d' % expedId
         pList = getExpedMemberInfo(expedId)
         for player in pList:

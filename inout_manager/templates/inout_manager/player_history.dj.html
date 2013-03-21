@@ -1,11 +1,72 @@
+{% load active %}
 <head>
+  <style type="text/css">
+    body {
+      padding-top: 60px;
+      padding-bottom: 40px;
+    }
+  </style>
+  <!--
   <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
-</head>
+  -->
+  <link href="{{STATIC_URL}}/css/bootstrap.min.css" rel="stylesheet"> </head> 
 <body>
-  <div class='container'>
-    {% for history in mig_history_list %}
-    <li>{{history}}</li>
-    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
-    {% endfor %}
-  </div>
-</body>
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <div class="nav-collapse collapse">
+          <ul class="nav">
+            <li><a class="brand" href="#">PLANET CORP</a></li>
+            <li class='{% naactive request '/player' %}'><a href="/inout_manager/player">Player</a></li>
+            <li class='{% naactive request '/death_note' %}'><a href="#">Death Node</a></li>
+            <!--<li class='{% naactive request '/about' %}'><a href="#">about</a></li>-->
+          </ul>
+          <!--
+          <form class="navbar-search pull-right">
+            <input type="text" class="search-query" placeholder="Search">
+          </form>
+          -->
+        </div>
+      </div>
+    </div>
+  </div> 
+
+
+  <div class='container-fluid'>
+    <div class="row">
+      <div class="span12 well">
+        <h2> Player History </h3>
+        <form method="get" action="{% url recent_event %}" class="form-inline" >
+          <input name="player_name" class=span5" type="text"  placeholder="madzone, 달비, 게임종료" >
+          <button type="submit" class="btn btn-primary"> <i class="icon-search icon-white"></i></button>
+        </form>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span12 well">
+        <table class='table table-striped'>
+          <thead>
+            <tr>
+              <th class='span2'>이름</th>
+              <th class='span3'>이전 원정대</th>
+              <th class='span3'>현재 원정대</th>
+              <th class='span3'>이전 가입 시기</th>
+              <th class='span3'>현재 가입 시기</th>
+            </tr>
+            </thead> <tbody>
+            {% for history in mig_history_list %}
+            <tr>
+              <td><a href='/inout_manager/player/{{history.name}}'>{{history.name}}</a></td>
+              <td>{{history.prev_exped_name}}</td>
+              <td>{{history.recent_exped_name}}</td>
+              <td>{{history.prev_time}}</td>
+              <td>{{history.recent_time}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="{{STATIC_URL}}/js/bootstrap.min.js"></script>
+  </body>
