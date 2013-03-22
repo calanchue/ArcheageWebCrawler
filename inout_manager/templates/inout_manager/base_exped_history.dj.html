@@ -1,7 +1,7 @@
 {% extends "inout_manager/base.dj.html" %}
 {% block content %}
 <div class='container-fluid'>
-  <div class="row">
+  <div class="row-fluid">
     <div class="span12 well">
       <h2> Expedition History </h2>
       <form method="get" action="{% url search_exped_event %}" class="form-inline" >
@@ -11,7 +11,5 @@
     </div>
   </div>
   {% include "inout_manager/mig_view.dj.html" %}
-  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-  <script src="{{STATIC_URL}}/js/bootstrap.min.js"></script>
   {% endblock content %}
 </div>

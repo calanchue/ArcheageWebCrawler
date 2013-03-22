@@ -16,8 +16,8 @@
           <td><a href='/inout_manager/player/{{history.name}}'>{{history.name}}</a></td>
           <td>{{history.prev_exped_name}}</td>
           <td>{{history.recent_exped_name}}</td>
-          <td>{{history.prev_time}}</td>
-          <td>{{history.recent_time}}</td>
+          <td>{{ history.prev_time|date:"Y/m/d" }}</td>
+          <td>{{ history.recent_time|date:"Y/m/d"}}</td>
         </tr>
         {% endfor %}
       </tbody>
