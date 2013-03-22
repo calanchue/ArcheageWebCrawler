@@ -1,0 +1,21 @@
+{% extends "inout_manager/base.dj.html" %}
+{% block content %}
+<div class='container-fluid'>
+  <div class="row-fluid">
+    <div class="span12 well">
+      <h2> Player History </h2>
+      <div class="span6">
+        <form method="get" action="{% url recent_event %}" class="form-inline" >
+          <input name="player_name"  type="text"  placeholder="madzone, 달비, 게임종료" >
+          <button type="submit" class="btn btn-primary"> <i class="icon-search icon-white"></i></button>
+        </form>
+      </div>
+      <div class="span6">
+      </div>
+    </div>
+  </div>
+  {% include "inout_manager/mig_view.dj.html" %}
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="{{STATIC_URL}}/js/bootstrap.min.js"></script>
+  {% endblock content %}
+</div>

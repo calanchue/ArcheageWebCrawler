@@ -12,6 +12,9 @@ def getSoup(url) :
     f.close()
     return BeautifulSoup(s)
     
+def isErrorPage(soup):
+    error_section = soup.find("section", {"class","errorpage"}) 
+    return error_section is not None
 
 def getExpedInfo(expedId) : 
     soup = getSoup("http://play.archeage.com/expeditions/HIRAMAKAND/"+str(expedId))
@@ -80,6 +83,12 @@ def getExpedListFromPage(pageNum) :
 def getExpedMemberInfo(expedId): 
     """ return MemberInfo List """
     soup = getSoup("http://play.archeage.com/expeditions/HIRAMAKAND/"+str(expedId)+"/members")
+    if  isErrorPage(soup):
+        exped = Expedition.objects.get(exped_id=expedId)
+        exped.update_time=currTime
+        exped.hidden = True
+        exped.save()
+        return []
     expedMemberTable = soup.find("tbody").findAll("tr")
     ret = []
     for memberRow in expedMemberTable :
@@ -98,10 +107,10 @@ def updatePlayerInfo(exped, player):
         if len(playerInDbHistory) == 0:
             Player(name=player.name, exped=exped, update_time=currTime, inserted_time=currTime).save()
             return
-        else :
-            playerInDb = playerInDbHistory[0]
 
-        if exped.exped_id == playerInDb.exped.exped_id:
+        playerInDb = playerInDbHistory[0]
+
+        if playerInDb.exped is not None and exped.exped_id == playerInDb.exped.exped_id:
             playerInDb.update_time=currTime
             playerInDb.save()
         else :
@@ -131,7 +140,7 @@ def startCrawling():
             updatePlayerInfo(exped, player)
     print '-------outed---------' 
     # remained player is someone who is out of exepdtion. update this.
-    playerNameOuted = list(set(Player.objects.exclude(update_time=inserted_time).values_list('name',flat=True)))           
+    playerNameOuted = list(set(Player.objects.exclude(update_time=currTime).values_list('name',flat=True)))           
     for playerName in playerNameOuted:
         print playerName
         player = Player.objects.filter(name=playerName).order_by('-update_time')[0]
@@ -142,7 +151,7 @@ def startCrawling():
             continue
         else :
             # new outsider
-            Player(name=playerName, exped=None, update_time = currTime, inserted_time=currTime, prev_record=player.exped ).save()
+            Player(name=playerName, exped=None, update_time = currTime, inserted_time=currTime, prev_record=player ).save()
 
 def run():
     #getExpedMemberInfo(1005)

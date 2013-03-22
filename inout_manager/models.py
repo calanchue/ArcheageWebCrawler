@@ -5,6 +5,7 @@ class Expedition(models.Model):
     exped_id = models.IntegerField()
     update_time = models.DateTimeField()
     inserted_time = models.DateTimeField()
+    hidden = models.BooleanField(default=False)
     def __repr__(self):
         return ("%s, %s, %s, %s" % (self.name, self.exped_id, self.update_time, self.inserted_time)).encode('utf8')
 

@@ -1,0 +1,29 @@
+<div class="row-fluid">
+  <div class="span12 well">
+    <table class='table table-striped'>
+      {% if mig_history_list %}
+      <thead>
+        <tr>
+          <th class='span2'>이름</th>
+          <th class='span3'>이전 원정대</th>
+          <th class='span3'>현재 원정대</th>
+          <th class='span3'>이전 가입 시기</th>
+          <th class='span3'>현재 가입 시기</th>
+        </tr>
+        </thead> <tbody>
+        {% for history in mig_history_list %}
+        <tr>
+          <td><a href='/inout_manager/player/{{history.name}}'>{{history.name}}</a></td>
+          <td>{{history.prev_exped_name}}</td>
+          <td>{{history.recent_exped_name}}</td>
+          <td>{{history.prev_time}}</td>
+          <td>{{history.recent_time}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <h2> NO RESULT </h2>
+    {% endif %}
+  </div>
+</div>

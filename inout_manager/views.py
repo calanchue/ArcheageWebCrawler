@@ -61,7 +61,7 @@ def recent_event(request):
         mig_history_list.append(MigHistory(prev_event, r_event))
 
     context = {'mig_history_list':mig_history_list}
-    return render_to_response('inout_manager/player_history.dj.html', context, context_instance=RequestContext(request))
+    return render_to_response('inout_manager/base_player_history.dj.html', context, context_instance=RequestContext(request))
 
 def player_event(request, player_name):
     player_event_list = Player.objects.filter(name=player_name).order_by('inserted_time')
@@ -73,7 +73,7 @@ def player_event(request, player_name):
         prev_event = event
 
     context = {'mig_history_list':mig_history_list}
-    return render_to_response('inout_manager/player_history.dj.html', context, context_instance=RequestContext(request))
+    return render_to_response('inout_manager/base_player_history.dj.html', context, context_instance=RequestContext(request))
 
 def exped_event(request, exped_name):
     exped = Expedition.objects.get(name=exeped_name)
@@ -82,5 +82,9 @@ def exped_event(request, exped_name):
     if event in exped_history:
         mig_history.append(MigHistory(event.prev_record, event))
     context = {'mig_history_list':mig_history_list}
-    return render_to_response('inout_manager/player_history.dj.html', context, context_instance=RequestContext(request))
+    return render_to_response('inout_manager/base_exped_history.dj.html', context, context_instance=RequestContext(request))
             
+def search_exped_event(request):
+    mig_history = []
+    context = {'mig_history_list':mig_history}
+    return render_to_response('inout_manager/base_exped_history.dj.html', context, context_instance=RequestContext(request))

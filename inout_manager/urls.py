@@ -7,5 +7,7 @@ urlpatterns = patterns('',
     url(r'^bootstrap_test$', views.bootstrap_test, name='bootstrap_test'),
     url(r'^player$', views.recent_event, name='recent_event'),
     url(r'^player/(?P<player_name>.+)$', views.player_event, name='player_event'),
+    url(r'^expedition/search_exped_event', views.search_exped_event, name='search_exped_event'),
+    url(r'^expedition/(?P<exped_name>.+)$', views.exped_event, name='exped_event'),
 )
 
