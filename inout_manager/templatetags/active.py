@@ -5,8 +5,8 @@ register = template.Library()
 def naactive(request, pattern):
     import re
     if re.search(pattern, request.path):
-        print pattern, request.path
+        #print pattern, request.path
         return 'active'
-    print 'fail'
+    #print 'fail'
     return ''
 

@@ -14,8 +14,8 @@
         {% for history in mig_history_list %}
         <tr>
           <td><a href='/inout_manager/player/{{history.name}}'>{{history.name}}</a></td>
-          <td>{{history.prev_exped_name}}</td>
-          <td>{{history.recent_exped_name}}</td>
+          <td><a href='/inout_manager/expedition/{{history.prev_exped_name}}'>{{history.prev_exped_name}}</a></td>
+          <td><a href='/inout_manager/expedition/{{history.recent_exped_name}}'>{{history.recent_exped_name}}</a></td>
           <td>{{ history.prev_time|date:"Y/m/d" }}</td>
           <td>{{ history.recent_time|date:"Y/m/d"}}</td>
         </tr>
@@ -23,7 +23,30 @@
       </tbody>
     </table>
     {% else %}
-      <h2> NO RESULT </h2>
+    <h2> NO RESULT </h2>
     {% endif %}
+
+    <div class="row-flouid">
+      <div class="span4 offset4" >
+        <div class="pagination">
+          <ul>
+            {% if mig_history_list.page.has_previous %}
+            <li><a href="?page_num={{ mig_history_list.page.previous_page_number }}">previous</a></li>
+            {% else %}
+            <li class="disabled prev"><a href="#">previous</a></li>
+            {% endif %}
+
+            <li class='active'><a href="?page_num=mig_history_list.page.number">Page {{ mig_history_list.page.number }} of {{ mig_history_list.page.paginator.num_pages }}</a><li>
+
+            {% if mig_history_list.page.has_next %}
+            <li><a href="?page_num={{ mig_history_list.page.next_page_number }}">next</a></li>
+            {% else %}
+            <li class="disabled next"><a href="#">next</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+      <div class="span4"> </div>
+    </div>
   </div>
 </div>

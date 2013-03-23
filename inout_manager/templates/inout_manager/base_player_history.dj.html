@@ -4,6 +4,7 @@
   <div class="row-fluid">
     <div class="span12 well">
       <h2> Player History </h2>
+      <div class="row-flouid">
       <div class="span6">
         <form method="get" action="{% url recent_event %}" class="form-inline" >
           <input name="player_name"  type="text"  placeholder="madzone, 달비, 게임종료" >
@@ -13,9 +14,8 @@
       <div class="span6">
       </div>
     </div>
+    </div>
   </div>
   {% include "inout_manager/mig_view.dj.html" %}
-  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-  <script src="{{STATIC_URL}}/js/bootstrap.min.js"></script>
   {% endblock content %}
 </div>

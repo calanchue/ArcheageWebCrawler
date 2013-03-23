@@ -103,7 +103,7 @@ def updatePlayerInfo(exped, player):
     try :
         # get one rows from multiple player rows.
         # the most recent date of the player
-        playerInDbHistory = Player.objects.filter(name=player.name).order_by('-update_time')
+        playerInDbHistory = Player.objects.filter(name=player.name).order_by('-inserted_time')
         if len(playerInDbHistory) == 0:
             Player(name=player.name, exped=exped, update_time=currTime, inserted_time=currTime).save()
             return
@@ -114,6 +114,7 @@ def updatePlayerInfo(exped, player):
             playerInDb.update_time=currTime
             playerInDb.save()
         else :
+            print playerInDb.id
             Player(name=player.name,exped=exped, update_time = currTime, inserted_time=currTime, prev_record=playerInDb ).save() 
     except ObjectDoesNotExist:
         Player(name=player.name, exped=exped, update_time=currTime, inserted_time=currTime ).save()
@@ -143,7 +144,7 @@ def startCrawling():
     playerNameOuted = list(set(Player.objects.exclude(update_time=currTime).values_list('name',flat=True)))           
     for playerName in playerNameOuted:
         print playerName
-        player = Player.objects.filter(name=playerName).order_by('-update_time')[0]
+        player = Player.objects.filter(name=playerName).order_by('-inserted_time')[0]
         if player.exped is None:
             # alredy outsider
             player.update_time = currTime

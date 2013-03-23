@@ -4,10 +4,16 @@
   <div class="row-fluid">
     <div class="span12 well">
       <h2> Expedition History </h2>
-      <form method="get" action="{% url search_exped_event %}" class="form-inline" >
-        <input name="exped_name" class=span5" type="text"  placeholder="야카모즈, 플라넷 상업조합" >
-        <button type="submit" class="btn btn-primary"> <i class="icon-search icon-white"></i></button>
-      </form>
+      <div class =row-fluid">
+      <div class="span6">
+        <form method="get" action="{% url search_exped_event %}" class="form-inline" >
+          <input name="exped_name"  type="text"  placeholder="야카모즈, 플라넷 상업조합" >
+          <button type="submit" class="btn btn-primary"> <i class="icon-search icon-white"></i></button>
+        </form>
+      </div>
+      <div class="span6">
+      </div>
+    </div>
     </div>
   </div>
   {% include "inout_manager/mig_view.dj.html" %}

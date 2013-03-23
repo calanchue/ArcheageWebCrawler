@@ -39,9 +39,15 @@ class MigHistory:
             self.prev_time = prev_event.inserted_time
         self.recent_exped_name = recent_event.exped.name if recent_event.exped is not None else '-'
         self.recent_time = recent_event.inserted_time 
+        self.id = recent_event.id
 
     def __repr__(self):
         return ('%s, %s, %s, %s, %s' %(self.name, self.prev_exped_name, self.recent_exped_name, self.prev_time, self.recent_time)).encode('utf8')
+
+class PagifiedList(list):
+    def __init__(self, page):
+        self.page = page
+    
 
 row_per_page = 25 
 
@@ -52,28 +58,45 @@ def get_page_num(request):
         page_num = 1
     return page_num
 
-def pagify_list(object, maxNum, currNum):
-    maxNum
-    maxNumj
+def get_list_from_paginator(paginator, page_num):
+    try:
+        list = paginator.page(page_num)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        list = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        list = paginator.page(paginator.num_pages)
+    return list
 
+def pagified_mig_history(player_queryset, page_num):
+    paginator = Paginator(player_queryset, row_per_page)
+    event_list = get_list_from_paginator(paginator, page_num)
+    pagified_history = PagifiedList(event_list)
+    for r_event in event_list:
+        #mig_history_list.append(MigHistory(r_event.prev_record, r_event))
+        pagified_history.append(MigHistory(r_event.prev_record, r_event))
+    
+    return pagified_history
 
 row_per_page=25
 def recent_history_list(page_num):
-    if page_num is None:
-        page_num = 1
-    recent_event_list = Player.objects.all().order_by('-inserted_time')[row_per_page*(page_num-1):row_per_page*page_num]  
+    all_recent_event_list = Player.objects.all().order_by('-inserted_time')  
+    """
+    paginator = Paginator(all_recent_event_list, row_per_page)
+
+    recent_event_list = get_list_from_paginator(paginator, page_num) 
+
     mig_history_list = []
+    pagified_history = PagifiedList(paginator)
     for r_event in recent_event_list:
-        prev_event = None
-        player_event_list = Player.objects.filter(name=r_event.name).order_by('-inserted_time')
-        for p_event in player_event_list:
-            #print r_event.name, p_event.inserted_time, r_event.inserted_time
-            if p_event.inserted_time < r_event.inserted_time:
-                #print 'pass'
-                prev_event = p_event
-                break;
-        mig_history_list.append(MigHistory(prev_event, r_event))
-    return mig_history_list
+        #mig_history_list.append(MigHistory(r_event.prev_record, r_event))
+        pagified_history.append(MigHistory(r_event.prev_record, r_event))
+    
+    return pagified_history
+    #return mig_history_list
+    """
+    return pagified_mig_history(all_recent_event_list, page_num)
 
 def recent_event(request):
     page_num = get_page_num(request)
@@ -88,14 +111,8 @@ def recent_event(request):
 
 def player_event(request, player_name):
     page_num = get_page_num(request)
-    player_event_list = Player.objects.filter(name=player_name).order_by('-inserted_time')[row_per_page*(page_num-1):row_per_page*page_num]
-
-    mig_history_list = [] 
-    prev_event = None
-    for event in player_event_list:
-        mig_history_list.append(MigHistory(prev_event, event))
-        prev_event = event
-
+    player_event_list = Player.objects.filter(name=player_name).order_by('-inserted_time') 
+    mig_history_list = pagified_mig_history(player_event_list,page_num) 
     context = {'mig_history_list':mig_history_list}
     return render_to_response('inout_manager/base_player_history.dj.html', context, context_instance=RequestContext(request))
 
@@ -108,11 +125,8 @@ def recent_exped_event(request):
 
 def exped_event(request, exped_name):
     page_num = get_page_num(request)
-    exped_history = Player.objects.filter(Q(exped__name=exped_name)|Q(prev_record__exped__name=exped_name)).order_by('-inserted_time')[row_per_page*(page_num-1):row_per_page*page_num]
-
-    mig_history_list = []
-    for event in exped_history:
-        mig_history_list.append(MigHistory(event.prev_record, event))
+    exped_history = Player.objects.filter(Q(exped__name=exped_name)|Q(prev_record__exped__name=exped_name)).order_by('-inserted_time')
+    mig_history_list = pagified_mig_history(exped_history, page_num) 
     context = {'mig_history_list':mig_history_list}
     return render_to_response('inout_manager/base_exped_history.dj.html', context, context_instance=RequestContext(request))
             
