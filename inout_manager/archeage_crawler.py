@@ -4,6 +4,7 @@ import urllib
 from django.utils import timezone
 from inout_manager.models import *
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Max
 
 
 def getSoup(url) :
@@ -115,9 +116,17 @@ def updatePlayerInfo(exped, player):
             playerInDb.save()
         else :
             print playerInDb.id
-            Player(name=player.name,exped=exped, update_time = currTime, inserted_time=currTime, prev_record=playerInDb ).save() 
+            player = Player(name=player.name,exped=exped, update_time = currTime, inserted_time=currTime, prev_record=playerInDb ) 
+            player.save()
+            player_recent = PlayerRecent.objects.get(name=player.name)
+            player_recent.recent_record = player
+            player_recent.save()
     except ObjectDoesNotExist:
-        Player(name=player.name, exped=exped, update_time=currTime, inserted_time=currTime ).save()
+        player = Player(name=player.name,exped=exped, update_time = currTime, inserted_time=currTime ) 
+        player.save()
+        player_recent = PlayerRecent.objects.get(name=player.name)
+        player_recent.recent_record = player
+        player_recent.save()
 
 
 def startCrawling():
@@ -141,10 +150,12 @@ def startCrawling():
             updatePlayerInfo(exped, player)
     print '-------outed---------' 
     # remained player is someone who is out of exepdtion. update this.
-    playerNameOuted = list(set(Player.objects.exclude(update_time=currTime).values_list('name',flat=True)))           
-    for playerName in playerNameOuted:
-        print playerName
-        player = Player.objects.filter(name=playerName).order_by('-inserted_time')[0]
+    #playerNameOuted = list(set(Player.objects.exclude(update_time=currTime).values_list('name',flat=True)))           
+
+    outed_player_list_id = PlayerRecent.objects.filter(recent_record__update_time__lt=currTime).values_list('recent_record', flat=True)
+    outed_player_list = Player.objects.filter(id__in=outed_player_list_id)
+
+    for player in outed_player_list:
         if player.exped is None:
             # alredy outsider
             player.update_time = currTime
@@ -152,16 +163,38 @@ def startCrawling():
             continue
         else :
             # new outsider
-            Player(name=playerName, exped=None, update_time = currTime, inserted_time=currTime, prev_record=player ).save()
+            player = Player(name=player.name, exped=None, update_time = currTime, inserted_time=currTime, prev_record=player )
+            player.save()
+            player_recent = PlayerRecent.objects.get(name=player.name)
+            player_recent.recent_record = player
+            player_recent.save()
+    
+
+def test():
+    name_time_list= Player.objects.values('name').annotate(recent_time=Max('update_time'))
+    for name_time in name_time_list:
+        print name_time['name'], name_time['recent_time']
+
+def updateRecentPlayer():
+    name_list=list(set(Player.objects.values_list('name',flat=True)))
+    for name in name_list:
+        player = Player.objects.filter(name=name).order_by('-inserted_time')[0]
+        try:
+            player_recent = PlayerRecent.objects.get(name=name);
+            player_recent.recent_record=player
+        except DoesNotExist:
+            PlayerRecent(name=name, recent_record = player).save() 
+    
 
 def run():
     #getExpedMemberInfo(1005)
     #playerInDb = Player.objects.filter(name='test_outed').order_by('-update_time')[0]
     #print 'expedition = %s' % playerInDb.exped.name
     startCrawling()
+    #updateRecentPlayer()
+    #test()
 
 #getExpedInfo(1005)
 #getExpedMemberInfo(1005)
 #getExpedList()
 #getExpedListFromPage(2)
-

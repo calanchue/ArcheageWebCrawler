@@ -19,6 +19,9 @@ class Player(models.Model):
     def __repr__(self):
         return ('%s, %s, %s, %s' % (self.name, self.exped.name if self.exped is not None else '-' , self.update_time, self.inserted_time)).encode('utf8')
 
+class PlayerRecent(models.Model):
+    name = models.CharField(max_length=30)
+    recent_record = models.OneToOneField('Player', null=True)
 
 
 # Create your models here.
