@@ -25,8 +25,8 @@
         <div class="nav-collapse collapse">
           <ul class="nav">
             <li><a class="brand" href="#">PLANET CORP</a></li>
-            <li class='{% naactive request '/player' %}'><a href="{% url recent_event %}">Player</a></li>
-            <li class='{% naactive request '/expedition' %}'><a href="{% url recent_exped_event %}">Expedition</a></li>
+            <li class='{% naactive request '/player' %}'><a href="{% url recent_event %}"><i class='icon-user icon-white'></i> Player</a></li>
+            <li class='{% naactive request '/expedition' %}'><a href="{% url recent_exped_event %}"><i class='icon-home icon-white'></i> Expedition</a></li>
             <li class='{% naactive request '/readme' %}'><a href="{% url readme  %}">ReadMe</a></li>
             <!--<li class='{% naactive request '/about' %}'><a href="#">about</a></li>-->
           </ul>
