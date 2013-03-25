@@ -7,13 +7,11 @@
     }
 
     .hover-icon-toggle{}
-    .hover-icon-toggle:hover {background-image: url("{{STATIC_URL}}img/glyphicons-halflings.png");}
+    .hover-icon-toggle:hover {background-image: url("{{STATIC_URL}}inout_manager/img/glyphicons-halflings.png");}
 
   </style>
-  <!--
   <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
-  -->
-  <link href="{{STATIC_URL}}inout_manager/css/bootstrap.min.css" rel="stylesheet"> 
+  <!--<link href="{{STATIC_URL}}inout_manager/css/bootstrap.min.css" rel="stylesheet"> -->
   <link href="{{STATIC_URL}}inout_manager/css/font-awesome.min.cs" rel="styleshee">
   {% block head %}
   {% endblock head %}
@@ -43,11 +41,12 @@
   {% block content %}
   {% endblock content %}
   <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-  <script src="{{STATIC_URL}}js/bootstrap.min.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
   <script type="text/javascript">  
     $(document).ready(
       function () {  
         $(".mig-tooltip").tooltip();  
+        console.log("migtooltip");
       }
     );  
   </script> 
