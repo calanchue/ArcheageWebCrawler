@@ -5,11 +5,16 @@
       padding-top: 60px;
       padding-bottom: 40px;
     }
+
+    .hover-icon-toggle{}
+    .hover-icon-toggle:hover {background-image: url("{{STATIC_URL}}img/glyphicons-halflings.png");}
+
   </style>
   <!--
   <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
   -->
-  <link href="{{STATIC_URL}}css/bootstrap.min.css" rel="stylesheet"> 
+  <link href="{{STATIC_URL}}inout_manager/css/bootstrap.min.css" rel="stylesheet"> 
+  <link href="{{STATIC_URL}}inout_manager/css/font-awesome.min.cs" rel="styleshee">
   {% block head %}
   {% endblock head %}
 </head> 
@@ -22,6 +27,7 @@
             <li><a class="brand" href="#">PLANET CORP</a></li>
             <li class='{% naactive request '/player' %}'><a href="{% url recent_event %}">Player</a></li>
             <li class='{% naactive request '/expedition' %}'><a href="{% url recent_exped_event %}">Expedition</a></li>
+            <li class='{% naactive request '/readme' %}'><a href="{% url readme  %}">ReadMe</a></li>
             <!--<li class='{% naactive request '/about' %}'><a href="#">about</a></li>-->
           </ul>
           <!--
@@ -38,4 +44,11 @@
   {% endblock content %}
   <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
   <script src="{{STATIC_URL}}js/bootstrap.min.js"></script>
+  <script type="text/javascript">  
+    $(document).ready(
+      function () {  
+        $(".mig-tooltip").tooltip();  
+      }
+    );  
+  </script> 
 </body>

@@ -10,5 +10,6 @@ urlpatterns = patterns('',
     url(r'^expedition$', views.recent_exped_event, name='recent_exped_event'),
     url(r'^expedition/search_exped_event$', views.search_exped_event, name='search_exped_event'),
     url(r'^expedition/(?P<exped_name>.+)$', views.exped_event, name='exped_event'),
+    url(r'^readme$', views.readme, name='readme'),
 )
 

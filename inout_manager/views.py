@@ -28,18 +28,22 @@ class MigHistory:
     def __init__(self, prev_event, recent_event):
         """ recent event must not be none """
         self.name = recent_event.name
+        self.prev_exped_id = None
         if prev_event is None:
-            self.prev_exped_name = '-'
-            self.prev_time = '-' 
+            self.prev_exped_name = None
+            self.prev_time = None 
         else:
             if prev_event.exped is None:
-                self.prev_exped_name = '-'
+                self.prev_exped_name = None
             else:
                 self.prev_exped_name = prev_event.exped.name
+                self.prev_exped_id = prev_event.exped.exped_id
             self.prev_time = prev_event.inserted_time
-        self.recent_exped_name = recent_event.exped.name if recent_event.exped is not None else '-'
+        self.recent_exped_name = recent_event.exped.name if recent_event.exped is not None else None 
+        self.recent_exped_id = recent_event.exped.exped_id if recent_event.exped is not None else None 
         self.recent_time = recent_event.inserted_time 
         self.id = recent_event.id
+        self.player_id = Player.objects.get(name=self.name).player_id
 
     def __repr__(self):
         return ('%s, %s, %s, %s, %s' %(self.name, self.prev_exped_name, self.recent_exped_name, self.prev_time, self.recent_time)).encode('utf8')
@@ -113,12 +117,12 @@ def player_event(request, player_name):
     page_num = get_page_num(request)
     player_event_list = PlayerHistory.objects.filter(name=player_name).order_by('-inserted_time') 
     mig_history_list = pagified_mig_history(player_event_list,page_num) 
-    context = {'mig_history_list':mig_history_list}
+    player = Player.objects.get(name=player_name)
+    context = {'mig_history_list':mig_history_list, 'player':player}
     return render_to_response('inout_manager/base_player_history.dj.html', context, context_instance=RequestContext(request))
 
 def recent_exped_event(request):
     page_num = get_page_num(request)
-
     mig_history_list = recent_history_list(page_num)
     context = {'mig_history_list':mig_history_list}
     return render_to_response('inout_manager/base_exped_history.dj.html', context, context_instance=RequestContext(request))
@@ -127,7 +131,8 @@ def exped_event(request, exped_name):
     page_num = get_page_num(request)
     exped_history = PlayerHistory.objects.filter(Q(exped__name=exped_name)|Q(prev_record__exped__name=exped_name)).order_by('-inserted_time')
     mig_history_list = pagified_mig_history(exped_history, page_num) 
-    context = {'mig_history_list':mig_history_list}
+    exped = Expedition.objects.get(name=exped_name)
+    context = {'mig_history_list':mig_history_list, 'exped':exped}
     return render_to_response('inout_manager/base_exped_history.dj.html', context, context_instance=RequestContext(request))
             
 def search_exped_event(request):
@@ -136,3 +141,6 @@ def search_exped_event(request):
     mig_history = []
     context = {'mig_history_list':mig_history}
     return render_to_response('inout_manager/base_exped_history.dj.html', context, context_instance=RequestContext(request))
+
+def readme(request):
+    return render_to_response('inout_manager/notice.dj.html',{}, context_instance=RequestContext(request))

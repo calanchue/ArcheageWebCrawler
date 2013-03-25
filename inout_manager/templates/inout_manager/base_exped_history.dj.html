@@ -12,7 +12,9 @@
         </form>
       </div>
       <div class="span6">
-        {% include "inout_manager/notice.html" %}
+        {% if exped %}
+        <a href="http://play.archeage.com/characters/{{exped.exped_id}}">archeage expedition page</a>
+        {% endif %}
       </div>
     </div>
     </div>

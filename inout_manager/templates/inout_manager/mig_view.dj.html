@@ -13,9 +13,22 @@
         </thead> <tbody>
         {% for history in mig_history_list %}
         <tr>
-          <td><a href='/inout_manager/player/{{history.name}}'>{{history.name}}</a></td>
-          <td><a href='/inout_manager/expedition/{{history.prev_exped_name}}'>{{history.prev_exped_name}}</a></td>
-          <td><a href='/inout_manager/expedition/{{history.recent_exped_name}}'>{{history.recent_exped_name}}</a></td>
+          <td>
+            <a href='/inout_manager/player/{{history.name}}'>{{history.name}} </a>
+            <a href='http://play.archeage.com/characters/{{history.player_id}}' >
+              <i title="archeage character page" class='icon-user icon-white hover-icon-toggle mig-tooltip'></i>
+            </a>
+          </td>
+          <td>
+            {% if history.prev_exped_name %}
+            <a href='/inout_manager/expedition/{{history.prev_exped_name}}'>{{history.prev_exped_name}} </a>
+            <a href='http://play.archeage.com/expeditions/HIRAMAKAND/{{history.prev_exped_id}}/members' title='archeage expedition page'><i title='archeage expedition page' class='icon-home icon-white hover-icon-toggle mig-tooltip'></i></a>
+            {% endif %}
+          </td>
+          <td>
+            <a href='/inout_manager/expedition/{{history.recent_exped_name}}'>{{history.recent_exped_name}} </a>
+            <a href='http://play.archeage.com/expeditions/HIRAMAKAND/{{history.recent_exped_id}}/members'><i  title='archeage expedition page' class='icon-home icon-white hover-icon-toggle mig-tooltip'></i></a>
+          </td>
           <td>{{ history.prev_time|date:"Y/m/d f" }}</td>
           <td>{{ history.recent_time|date:"Y/m/d f"}}</td>
         </tr>
