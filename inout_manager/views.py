@@ -17,7 +17,7 @@ def bootstrap_test(request):
     return render_to_response('inout_manager/index.html',{}, context_instance=RequestContext(request))
 
 def response(request):
-    #latest_player = Player.objects.order_by('name')[:5]
+    #latest_player = PlayerHistory.objects.order_by('name')[:5]
     #template = loader.get_template('inout_manager/index.html')
     #context = Context({'latest_poll_list': latest_player,})
     #return HttpResponse(template.render(context))
@@ -81,7 +81,7 @@ def pagified_mig_history(player_queryset, page_num):
 
 row_per_page=25
 def recent_history_list(page_num):
-    all_recent_event_list = Player.objects.all().order_by('-inserted_time')  
+    all_recent_event_list = PlayerHistory.objects.all().order_by('-inserted_time')  
     """
     paginator = Paginator(all_recent_event_list, row_per_page)
 
@@ -111,7 +111,7 @@ def recent_event(request):
 
 def player_event(request, player_name):
     page_num = get_page_num(request)
-    player_event_list = Player.objects.filter(name=player_name).order_by('-inserted_time') 
+    player_event_list = PlayerHistory.objects.filter(name=player_name).order_by('-inserted_time') 
     mig_history_list = pagified_mig_history(player_event_list,page_num) 
     context = {'mig_history_list':mig_history_list}
     return render_to_response('inout_manager/base_player_history.dj.html', context, context_instance=RequestContext(request))
@@ -125,7 +125,7 @@ def recent_exped_event(request):
 
 def exped_event(request, exped_name):
     page_num = get_page_num(request)
-    exped_history = Player.objects.filter(Q(exped__name=exped_name)|Q(prev_record__exped__name=exped_name)).order_by('-inserted_time')
+    exped_history = PlayerHistory.objects.filter(Q(exped__name=exped_name)|Q(prev_record__exped__name=exped_name)).order_by('-inserted_time')
     mig_history_list = pagified_mig_history(exped_history, page_num) 
     context = {'mig_history_list':mig_history_list}
     return render_to_response('inout_manager/base_exped_history.dj.html', context, context_instance=RequestContext(request))

@@ -30,10 +30,11 @@ def getExpedInfo(expedId) :
     print(count.text)
 
 class MemberInfo : 
-    def __init__(self, name, classType, level) : 
+    def __init__(self, name, classType, level,id) : 
         self.name = name
         self.classType = classType
         self.level = level
+        self.id = id
         
     def __repr(self) :
         return "name=%s, classType=%s, level=%d" % (self.name, self.classType, self.level)
@@ -95,8 +96,10 @@ def getExpedMemberInfo(expedId):
     ret = []
     for memberRow in expedMemberTable :
         memberInfo = memberRow.findAll("td")
-        print memberInfo[1].find("a").text
-        ret.append(MemberInfo(memberInfo[1].find("a").text, memberInfo[3].text, memberInfo[2].text))
+        print memberInfo[1].find("a").text.encode('utf8')
+        print memberInfo[1].find("a")
+        id = memberInfo[1].find("a")['data-uuid']
+        ret.append(MemberInfo(memberInfo[1].find("a").text, memberInfo[3].text, memberInfo[2].text,id))
     return ret
 
 def updatePlayerInfo(exped, player):
@@ -105,9 +108,10 @@ def updatePlayerInfo(exped, player):
     try :
         # get one rows from multiple player rows.
         # the most recent date of the player
-        playerInDbHistory = Player.objects.filter(name=player.name).order_by('-inserted_time')
+        playerInDbHistory = PlayerHistory.objects.filter(name=player.name).order_by('-inserted_time')
         if len(playerInDbHistory) == 0:
-            Player(name=player.name, exped=exped, update_time=currTime, inserted_time=currTime).save()
+            ph = PlayerHistory(name=player.name, exped=exped, update_time=currTime, inserted_time=currTime).save()
+            Player(name=player.name, player_id=player.id, recent_record=ph).save()
             return
 
         playerInDb = playerInDbHistory[0]
@@ -117,15 +121,15 @@ def updatePlayerInfo(exped, player):
             playerInDb.save()
         else :
             print playerInDb.id
-            player = Player(name=player.name,exped=exped, update_time = currTime, inserted_time=currTime, prev_record=playerInDb ) 
+            player = PlayerHistory(name=player.name,exped=exped, update_time = currTime, inserted_time=currTime, prev_record=playerInDb ) 
             player.save()
-            player_recent = PlayerRecent.objects.get(name=player.name)
+            player_recent = Player.objects.get(name=player.name)
             player_recent.recent_record = player
             player_recent.save()
     except ObjectDoesNotExist:
-        player = Player(name=player.name,exped=exped, update_time = currTime, inserted_time=currTime ) 
+        player = PlayerHistory(name=player.name,exped=exped, update_time = currTime, inserted_time=currTime ) 
         player.save()
-        player_recent = PlayerRecent.objects.get(name=player.name)
+        player_recent = Player.objects.get(name=player.name)
         player_recent.recent_record = player
         player_recent.save()
 
@@ -148,15 +152,15 @@ def startCrawling():
         print '# process exped %d' % expedId
         pList = getExpedMemberInfo(expedId)
         for player in pList:
-            print player.name
+            print player.name.encode('utf8')
             exped = Expedition.objects.get(exped_id=expedId)
             updatePlayerInfo(exped, player)
     print '-------outed---------' 
     # remained player is someone who is out of exepdtion. update this.
-    #playerNameOuted = list(set(Player.objects.exclude(update_time=currTime).values_list('name',flat=True)))           
+    #playerNameOuted = list(set(PlayerHistory.objects.exclude(update_time=currTime).values_list('name',flat=True)))           
 
-    outed_player_list_id = PlayerRecent.objects.filter(recent_record__update_time__lt=currTime).values_list('recent_record', flat=True)
-    outed_player_list = Player.objects.filter(id__in=outed_player_list_id)
+    outed_player_list_id = Player.objects.filter(recent_record__update_time__lt=currTime).values_list('recent_record', flat=True)
+    outed_player_list = PlayerHistory.objects.filter(id__in=outed_player_list_id)
 
     for player in outed_player_list:
         if player.exped is None:
@@ -166,32 +170,32 @@ def startCrawling():
             continue
         else :
             # new outsider
-            player = Player(name=player.name, exped=None, update_time = currTime, inserted_time=currTime, prev_record=player )
+            player = PlayerHistory(name=player.name, exped=None, update_time = currTime, inserted_time=currTime, prev_record=player )
             player.save()
-            player_recent = PlayerRecent.objects.get(name=player.name)
+            player_recent = Player.objects.get(name=player.name )
             player_recent.recent_record = player
             player_recent.save()
     
 
 def test():
-    name_time_list= Player.objects.values('name').annotate(recent_time=Max('update_time'))
+    name_time_list= PlayerHistory.objects.values('name').annotate(recent_time=Max('update_time'))
     for name_time in name_time_list:
         print name_time['name'], name_time['recent_time']
 
 def updateRecentPlayer():
-    name_list=list(set(Player.objects.values_list('name',flat=True)))
+    name_list=list(set(PlayerHistory.objects.values_list('name',flat=True)))
     for name in name_list:
-        player = Player.objects.filter(name=name).order_by('-inserted_time')[0]
+        player = PlayerHistory.objects.filter(name=name).order_by('-inserted_time')[0]
         try:
-            player_recent = PlayerRecent.objects.get(name=name);
+            player_recent = Player.objects.get(name=name);
             player_recent.recent_record=player
         except DoesNotExist:
-            PlayerRecent(name=name, recent_record = player).save() 
+            Player(name=name, recent_record = player).save() 
     
 
 def run():
     #getExpedMemberInfo(1005)
-    #playerInDb = Player.objects.filter(name='test_outed').order_by('-update_time')[0]
+    #playerInDb = PlayerHistory.objects.filter(name='test_outed').order_by('-update_time')[0]
     #print 'expedition = %s' % playerInDb.exped.name
     startCrawling()
     #updateRecentPlayer()
