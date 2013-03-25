@@ -5,6 +5,7 @@ from django.utils import timezone
 from inout_manager.models import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Max
+from datetime import datetime
 
 
 def getSoup(url) :
@@ -131,7 +132,9 @@ def updatePlayerInfo(exped, player):
 
 def startCrawling():
     global currTime 
-    currTime = timezone.now()    
+    currTime = datetime.now()    
+
+    print 'start crawling %s' % currTime
     
     #update exped
     crawledList = getAllExpedList()
