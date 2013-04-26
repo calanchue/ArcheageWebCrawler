@@ -185,10 +185,13 @@ def test():
 def updateRecentPlayer():
     name_list=list(set(PlayerHistory.objects.values_list('name',flat=True)))
     for name in name_list:
+        print name
         player = PlayerHistory.objects.filter(name=name).order_by('-inserted_time')[0]
+        print player.id
         try:
             player_recent = Player.objects.get(name=name);
             player_recent.recent_record=player
+            player_recent.save()
         except DoesNotExist:
             Player(name=name, recent_record = player).save() 
     

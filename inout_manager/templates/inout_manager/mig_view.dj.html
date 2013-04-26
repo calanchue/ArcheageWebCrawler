@@ -26,10 +26,12 @@
             {% endif %}
           </td>
           <td>
+            {% if history.recent_exped_name %}
             <a href='/inout_manager/expedition/{{history.recent_exped_name}}'>{{history.recent_exped_name}} </a> 
             <a href='http://play.archeage.com/expeditions/HIRAMAKAND/{{history.recent_exped_id}}/members'>
               <i  title='아키에이지 웹사이트 원정대 페이지로' data-toggle="tooltip" class='icon-home icon-white hover-icon-toggle mig-tooltip'></i>
             </a> 
+            {% endif %}
           </td> 
           <td>{{ history.prev_time|date:"Y/m/d f" }}</td> 
           <td>{{ history.recent_time|date:"Y/m/d f"}}</td>

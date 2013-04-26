@@ -1,0 +1,1 @@
+2 1 6,18 * * * ( date; cd /root/project/archeage_web_crawler &&/usr/local/bin/python2.7 ./manage.py crawling )>> /var/log/crawling.out 2>&1
